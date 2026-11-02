@@ -105,6 +105,18 @@ def analyze(
 
 
 @app.command()
+def dashboard():
+    """Open a local watchlist with on-demand research at http://127.0.0.1:8765."""
+    from cli.dashboard import serve_dashboard
+
+    try:
+        serve_dashboard(DEFAULT_CONFIG)
+    except OSError:
+        console.print("[red]Could not start the dashboard. Check port 8765 and results-directory permissions.[/red]")
+        raise typer.Exit(code=1) from None
+
+
+@app.command()
 def backtest(
     tickers: str = typer.Argument(..., help="Comma-separated tickers, e.g. NVDA,AAPL"),
     start: str = typer.Option(..., "--start", help="First analysis date, YYYY-MM-DD"),

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mis acciones · TradingAgents</title>
+  <link rel="stylesheet" href="/dashboard.css">
+  <script src="/dashboard.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">TRADINGAGENTS <span>ESPACIO LOCAL</span></p>
+      <h1>Mis acciones</h1>
+      <p class="intro">Tu lista de seguimiento, con investigación cuando la necesitas.</p>
+    </header>
+    <form id="search-form" role="search">
+      <div class="field">
+        <label for="query">Buscar una acción</label>
+        <input id="query" name="query" placeholder="Nombre o símbolo, ej. Apple o AAPL" maxlength="80" required autocomplete="off" spellcheck="false" aria-describedby="symbol-help">
+        <small id="symbol-help">Busca en Yahoo Finance y comprueba la empresa y el mercado antes de añadirla. No consume llamadas de IA.</small>
+      </div>
+      <button type="submit">Buscar</button>
+    </form>
+    <p id="search-status" role="status" aria-live="polite"></p>
+    <ul id="search-results" aria-label="Resultados de búsqueda" hidden></ul>
+    <p id="error" role="alert" hidden></p>
+    <div class="list-heading">
+      <h2 id="watchlist-heading" tabindex="-1">En seguimiento <span id="count">0</span></h2>
+      <p id="activity" role="status" aria-live="polite">Conectando…</p>
+    </div>
+    <div id="empty" hidden>
+      <h3>Empieza por una empresa que conozcas</h3>
+      <p>Búscala arriba y selecciona el resultado correcto. Añadirla no inicia ningún análisis ni consume llamadas de IA.</p>
+    </div>
+    <section id="stocks" aria-label="Acciones en seguimiento"></section>
+    <nav id="pagination" aria-label="Páginas de acciones" hidden>
+      <p id="page-status" role="status" aria-live="polite"></p>
+      <div>
+        <button id="previous-page" type="button" aria-controls="stocks">Anterior</button>
+        <button id="next-page" type="button" aria-controls="stocks">Siguiente</button>
+      </div>
+    </nav>
+    <section class="setup" aria-label="Configuración del análisis">
+      <div><strong>Motor de investigación</strong>
+        <p>Fundamentales, mercado y noticias · Debate alcista y bajista · Evaluación de riesgos</p>
+      </div>
+      <details><summary>Modelos y configuración</summary>
+        <p id="models">Cargando configuración…</p>
+        <p>El panel utiliza tu archivo <code>.env</code>. Configura el proveedor, los modelos y sus credenciales allí y reinicia el panel si los cambias. Las claves nunca se muestran aquí.</p>
+      </details>
+    </section>
+    <footer>
+      <p>Precios de la sesión regular y sectores de Yahoo Finance. Se consultan cada minuto con el panel abierto, sin usar IA. La hora mostrada corresponde a la cotización, en tu zona horaria. Puede haber retrasos; fuera de sesión se muestra el último precio disponible.</p>
+      <p>Los informes se generan para la fecha actual, de uno en uno. Pueden tardar varios minutos y consumir tu API o los límites de tu suscripción.</p>
+      <p>Tu lista se conserva al reiniciar. Cerrar esta pestaña no detiene el análisis; cerrar el servidor sí. Quitar una acción no borra sus informes del disco.</p>
+      <p>Herramienta de investigación, no asesoramiento financiero. Contrasta las cifras y las fuentes antes de invertir.</p>
+    </footer>
+  </main>
+</body>
+</html>

@@ -221,6 +221,91 @@ At start-up the interactive CLI mentions a newer release and notices from Tauric
 
 A saved report also includes `complete_report.html`, the report as one page with its sections listed beside the text, for reading in a browser, on a phone or in print. Answering the save question at the prompt also asks about the page and can open it in your browser; `--no-html` skips it, and so does `ta.save_reports(state, "NVDA", html=False)` from Python.
 
+### Fork maintenance
+
+This fork lives at https://github.com/NoahWTeng/TradingAgents. The original project
+is https://github.com/TauricResearch/TradingAgents.
+
+- `origin` points to the fork; publish local changes there.
+- `upstream` points to the original project; fetch improvements from there.
+- Local `.env` credentials, watchlists, and generated reports are not published.
+
+To bring upstream improvements into the fork, first commit your work and make
+sure the working tree is clean, then run:
+
+```bash
+git switch main
+git fetch upstream
+git merge upstream/main
+```
+
+If there are conflicts, resolve and review them before continuing; do not
+force-push or reset away the fork's changes. In the project's Python environment,
+run `pytest -q` and `ruff check .`, check the dashboard, and only then publish
+with `git push origin main`. Fetching upstream does not update the fork by itself.
+
+### Local watchlist dashboard
+
+Keep a watchlist and generate research from a local browser page:
+
+```bash
+tradingagents dashboard
+# Or, from the repository's activated Python environment:
+python -m cli.main dashboard
+```
+
+Open **http://127.0.0.1:8765**. Search by company name or Yahoo Finance symbol
+(such as `Apple`, `AAPL`, or `0700.HK`), check the company and exchange in the
+results, then choose **Añadir**. Search lists equities only, not ETFs, indices,
+crypto, or other instruments. The server independently verifies the exact symbol
+with Yahoo Finance before saving it, including requests made directly to the API.
+No matches and provider outages are shown separately; neither adds a symbol.
+Existing watchlist entries are preserved, not retroactively verified.
+The watchlist displays ten stocks per page; previous/next controls appear when
+needed, and background quote updates keep the current page selected.
+Searching and saving do not call a model. Search results establish a listing,
+not a guarantee that current prices or fundamentals will be available.
+Choose **Generate report** (shown as **Generar informe** in the Spanish interface)
+when ready. Each analysis requires confirmation, uses today's date,
+and runs the market, news, and fundamentals analysts through the existing
+research, trading, and risk pipeline. Only one analysis runs at a time.
+
+Each saved stock also shows its company name (the full name when Yahoo Finance
+provides it), latest regular-session price, quote currency, quote timestamp
+(in the browser's local time zone), and sector.
+These requests use no LLM and run in the background without blocking reports.
+While the dashboard is open, quotes are cached in memory and refreshed at most
+once per minute per symbol. Prices can be delayed and may belong to the last
+trading session; they are not streaming real-time quotes. Minor currency units
+such as `GBp` are preserved, not silently relabeled as `GBP`. Missing fields are
+shown as unavailable. A failed refresh retains the previous price and timestamp
+with a stale-data warning and retries later. The quote cache resets on server
+restart; watchlist entries and saved reports are unaffected.
+
+Configure your provider, models, and credentials in `.env` before analyzing:
+`TRADINGAGENTS_LLM_PROVIDER`, `TRADINGAGENTS_QUICK_THINK_LLM`, and
+`TRADINGAGENTS_DEEP_THINK_LLM`, plus the provider's API key or existing ChatGPT
+sign-in. There are no setup prompts in the dashboard. It uses the same
+`TRADINGAGENTS_*` configuration as the CLI; reports default to Spanish here
+unless `TRADINGAGENTS_OUTPUT_LANGUAGE` is set. Restart the server after changing
+configuration. Model calls incur the provider's normal costs or plan limits.
+
+The watchlist and latest-report references are stored in
+`<results_dir>/watchlist.sqlite3` (by default
+`~/.tradingagents/logs/watchlist.sqlite3`); reports are stored under
+`<results_dir>/reports/`. The page shows the date and rating of the latest
+successful report and opens its HTML in a new tab. A failed refresh preserves
+the previous report. Removing a symbol removes its watchlist entry, not its
+report files. Other reports previously generated through the CLI are not
+imported into the list.
+
+Run one dashboard instance at a time. It binds only to the loopback interface
+and is intended for a trusted, single-user computer, not public hosting.
+Closing the browser does not cancel an analysis; stopping the server does.
+After an interrupted run, restart the dashboard and generate the report again;
+it does not retry or spend model calls automatically. There is no scheduled
+analysis, streaming price feed, or broker connection.
+
 ### Markets and tickers
 
 TradingAgents works with any market Yahoo Finance covers, using the exchange-suffixed ticker. Company identity and the alpha benchmark resolve automatically per market.
